@@ -85,7 +85,7 @@ export default (fileInfo, api) => {
     if (lodashRequireCallCollection.length === 0) {
         return;
     }
-    
+
     const lodashRequireCall = lodashRequireCallCollection.get(0);
 
     // Named used to be sure when we search lodash call methods
@@ -126,11 +126,5 @@ export default (fileInfo, api) => {
     lodashMethods.forEach(insertLodashRequireForMethodName);
     deleteRootLodashRequire();
 
-    // const lodashIdentifiers = callExpressions.find(j.Identifier, {
-    //     name: '_'
-    // });
-
-    // lodashIdentifiers.remove();
-
-    return root.toSource();
+    return root.toSource({quote: 'single'});
 };
