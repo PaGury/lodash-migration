@@ -31,9 +31,11 @@ export default (fileInfo, api) => {
 
         // Uniqify lodash methodsNames
         const a = [];
-        calls.forEach(({node})=> a.push(node.callee.property.name));
+        calls.forEach(({
+            node
+        }) => a.push(node.callee.property.name));
         const lodashMethodNames = [...new Set(a)];
-        
+
         // Count if any methods already exists with these names
         // If it is, throw error and skip the file checking
         const totalExistingCalls = lodashMethodNames.reduce((t, name) => t + root.find(j.CallExpression, {
@@ -65,7 +67,7 @@ export default (fileInfo, api) => {
             node.callee = calleeProperty;
 
             lodashMethods.push(calleeProperty.name);
-            
+
             return node;
         });
 
@@ -74,11 +76,17 @@ export default (fileInfo, api) => {
 
     // Backup the lodash require node to delete it later
     // Used to insert before others nodes later
-    const lodashRequireCall = root.find(j.CallExpression, {
+    const lodashRequireCallCollection = root.find(j.CallExpression, {
         arguments: [{
             value: 'lodash'
         }]
-    }).get(0);
+    });
+
+    if (lodashRequireCallCollection.length === 0) {
+        return;
+    }
+    
+    const lodashRequireCall = lodashRequireCallCollection.get(0);
 
     // Named used to be sure when we search lodash call methods
     // If dev use 'var lodash = require('lodash');' it will works too
@@ -88,7 +96,7 @@ export default (fileInfo, api) => {
     let lodashMethods = [];
     try {
         lodashMethods = replaceLodashMethodsAndReturnArrayOfIt(lodashName);
-    } catch(e) {
+    } catch (e) {
         if (e instanceof SkipError) {
             return;
         }
